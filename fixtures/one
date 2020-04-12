@@ -1,0 +1,14 @@
+{
+  "inputs": [
+    {
+      "baudrate": 4800,
+      "path": "/dev/ttyUSB0"
+    }
+  ],
+  "repeaters": [
+    {
+      "type": "udp",
+      "port": 10110
+    }
+  ]
+}
