@@ -1,5 +1,5 @@
 {
-  "name": "@matthewdenson/gpsrepeater",
+  "name": "@matthewdenson/gpsmonitor",
   "version": "1.0.0",
   "description": "gpsmonitor -- gps console and network repeater",
   "main": "lib/index.js",
@@ -39,12 +39,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/mdenson-dayspring/gpsrepeater.git"
+    "url": "https://github.com/mdenson-dayspring/gpsmonitor.git"
   },
-  "author": "Matthew Denson <mdenson@dayspring-tech.com>",
+  "author": "Matthew Denson <matthew@densons.org>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mdenson-dayspring/gpsreapeater/issues"
+    "url": "https://github.com/mdenson-dayspring/gpsmonitor/issues"
   },
-  "homepage": "https://github.com/mdenson-dayspring/gpsrepeater#readme"
+  "homepage": "https://github.com/mdenson-dayspring/gpsmonitor#readme"
 }
