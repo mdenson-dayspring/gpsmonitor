@@ -1,6 +1,12 @@
 # @matthewdenson/gpsmonitor
 
-# Install to use
+This is a small app that will be used on my boat to multiplex my GPS and AIS receiver data to my boat's 
+LAN. I'm also planning to have this run on a raspi that will have a small console to report the current 
+course, speed and location to the helm positon.
+
+A work in progress right now.
+
+# Install to use (not on npm yet)
 ```
 $ sudo npm i -g @matthewdenson/gpsmonitor
 ```
