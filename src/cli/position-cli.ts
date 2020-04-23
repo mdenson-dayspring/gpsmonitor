@@ -1,10 +1,18 @@
 import blessed = require('blessed');
-import { getFileContents, IGPSPosition, NMEASource, print, printError, UDPServer } from '../lib';
+import { BehaviorSubject, merge } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { checksum, getFileContents, IGPSPosition, NMEASource, printError, UDPServer } from '../lib';
 
 export const main = async (param: string, filename: string): Promise<number> => {
   try {
     const settingsText = await getFileContents(filename);
     const settings = JSON.parse(settingsText);
+
+    const start = new Date();
+    const custom = new BehaviorSubject<string>('PMEDI,' + formatDate(start) + ',' +formatTime(start))
+      .pipe(map(inStr => {
+        return '$' + inStr + '*' + formatNumber(checksum(inStr), 2, 16);
+      }));
 
     const source = new NMEASource({
       baudRate: settings.inputs[0].baudrate,
@@ -12,7 +20,7 @@ export const main = async (param: string, filename: string): Promise<number> => 
     });
 
     const server = new UDPServer(settings.repeaters[0].port);
-    server.subscribeTo(source.sentences());
+    server.subscribeTo(merge(custom, source.sentences()));
 
     return await exitCode(server, source);
   } catch (e) {
@@ -20,6 +28,39 @@ export const main = async (param: string, filename: string): Promise<number> => 
     return 1;
   }
 };
+
+const formatDate = (d: Date): string => {
+  return formatNumber(d.getUTCFullYear(), 2) +
+  formatNumber(d.getUTCMonth() + 1, 2) +
+  formatNumber(d.getUTCDate(), 2);
+}
+const formatTime = (d: Date): string => {
+  return formatNumber(d.getUTCHours(), 2) +
+  formatNumber(d.getUTCMinutes() + 1, 2) +
+  formatNumber(d.getUTCSeconds(), 2) + '.' +
+  formatNumber(d.getUTCMilliseconds(), 3);
+}
+/**
+ *
+ * @param n Number to print
+ * @param places Number of places in the string (zeros prepended)
+ * @param radix Radix to use to convert to string (default: 10)
+ */
+const formatNumber = (n: number, places?: number, radix?: number): string => {
+  let ret = '';
+  if (places) {
+    ret = '0'.repeat(places);
+  }
+  if (radix) {
+    ret += n.toString(radix);
+  } else {
+    ret += n.toString(10);
+  }
+  if (places) {
+    ret = ret.substr(ret.length - places, places);
+  }
+  return ret;
+}
 
 const exitCode = async (server: UDPServer, source: NMEASource): Promise<number> => {
   return new Promise(resolve => {
@@ -87,7 +128,7 @@ class ScreenUI {
   }
 }
 
-const formatLat = (lat?:number): string => {
+const formatLat = (lat?: number): string => {
   if (lat === undefined) {
     return '--';
   }
@@ -97,9 +138,9 @@ const formatLat = (lat?:number): string => {
     lat = lat * -1;
   }
   const str = lat.toString();
-  return '' + str.substr(0, str.length - 7) + '°' + str.substr(str.length-7) + ns;
+  return '' + str.substr(0, str.length - 7) + '°' + str.substr(str.length - 7) + ns;
 };
-const formatLong = (long?:number): string => {
+const formatLong = (long?: number): string => {
   if (long === undefined) {
     return '--';
   }
@@ -109,5 +150,5 @@ const formatLong = (long?:number): string => {
     long = long * -1;
   }
   const str = long.toString();
-  return '' + str.substr(0, str.length - 7) + '°' + str.substr(str.length-7) + ew;
+  return '' + str.substr(0, str.length - 7) + '°' + str.substr(str.length - 7) + ew;
 };

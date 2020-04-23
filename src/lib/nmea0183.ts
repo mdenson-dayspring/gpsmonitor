@@ -1,5 +1,5 @@
 import { Observable, Subject, Subscriber } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import { filter} from 'rxjs/operators';
 import * as SerialPort from 'serialport';
 
 export interface INMEAOptions {
@@ -65,7 +65,7 @@ export interface IGPSPosition {
 }
 const filterValid = () => {
   return filter((packet: string) => {
-    if (packet.startsWith('$')) {
+    if (packet.startsWith('$') || packet.startsWith('!')) {
       const data = packet.substr(1, packet.length - 4);
       const csc = packet.substr(packet.length - 2);
       return checksum(data) === parseInt(csc, 16);
@@ -114,7 +114,7 @@ const parsePosition = () => {
     });
   };
 };
-const checksum = (str: string): number => {
+export const checksum = (str: string): number => {
   let c = 0;
 
   for (let i = 0; i < str.length; i++) {
